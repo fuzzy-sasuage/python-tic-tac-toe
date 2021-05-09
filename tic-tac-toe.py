@@ -1,4 +1,13 @@
 import random
+import os
+emptychar = ' '
+usevectors = True
+
+theBoard = [
+        [emptychar, emptychar, emptychar], 
+        [emptychar, emptychar, emptychar], 
+        [emptychar, emptychar, emptychar]
+        ]
 
 #Vector2 Class
 
@@ -13,17 +22,22 @@ class Vector2:
         pass
 
 def drawBoard(board):
-    print('   |   |')
-    print(' ' + board[1] + ' | ' + board[2] + ' | ' + board[3])
-    print('   |   |')
-    print('-----------')
-    print('   |   |')
-    print(' ' + board[4] + ' | ' + board[5] + ' | ' + board[6])
-    print('   |   |')
-    print('-----------')
-    print('   |   |')
-    print(' ' + board[7] + ' | ' + board[8] + ' | ' + board[9])
-    print('   |   |')
+    for i in range(len(board)):
+        row = ''
+        for j in range(len(board[i])):
+            row += ' |' + board[i][j] + '| '
+        print(row + '\n')
+    # print('   |   |')
+    # print(' ' + board[1] + ' | ' + board[2] + ' | ' + board[3])
+    # print('   |   |')
+    # print('-----------')
+    # print('   |   |')
+    # print(' ' + board[4] + ' | ' + board[5] + ' | ' + board[6])
+    # print('   |   |')
+    # print('-----------')
+    # print('   |   |')
+    # print(' ' + board[7] + ' | ' + board[8] + ' | ' + board[9])
+    # print('   |   |')
 
 def inputPlayerLetter():
     letter = ''
@@ -59,31 +73,105 @@ def playAgain():
 
 def makeMove(board, letter, move):
 
-    board[move] = letter
+    board[move.y][move.x] = letter
+
+def canWin(bo, le):  # NOT FULLY IMPLEMENTED YET!
+    if usevectors: # USING 2D ARRAYS
+
+        possiblecount = 0 # Define integer to count the number of possible wins there can be.
+        
+        pos = Vector2(-1, -1) # Define a Vector2 to return; Will return as "(-1, -1)" if unchanged, representing there was no possible win yet.
+
+        possible = [] # Define list of possible remaining moves, from which to simulate outcomes.
+        for i in range(len(bo)):
+            for j in range(len(bo[i])):
+                if isSpaceFree(bo, Vector2(i, j), emptychar):
+                    possible.append(Vector2(i, j)) # Add possible move to array, because that space is empty.
+        
+        # Iterate over each possible move (Empty spaces) for a way that a player might win.
+        for i in range(len(possible)): 
+            # Establish simulated board (2D Array), so as to not tamper with the original board while simulating it.
+            print('Attempt: (' + str(possible[i].x) + ', ' + str(possible[i].y) + ')')
+            sim_board = bo
+            # Iterate over all positions of simulated board to find possible wins.
+            for i in range(len(sim_board)):
+                for j in range(len(sim_board[i])):
+                    if isSpaceFree(sim_board, Vector2(i, j), emptychar):
+                        pass
+            i1 = possible[i].x
+            j1 = possible[i].y
+            sim_board = getBoardCopy(sim_board)
+            sim_board[possible[i].y][possible[i].x] = le
+            makeMove(sim_board, 'X', possible[i]) # Simulate Move
+            drawBoard(sim_board)
+            
+            #os.system('cls' if os.name == 'nt' else 'clear')
+            if ((sim_board[2][0] == le and sim_board[2][1] == le and sim_board[2][2] == le) or # across the top
+
+            (sim_board[1][0] == le and sim_board[1][1] == le and sim_board[1][2] == le) or # across the middle
+
+            (sim_board[0][0] == le and sim_board[0][1] == le and sim_board[0][2] == le) or # across the sim_boardttom
+            (sim_board[0][0] == le and sim_board[1][0] == le and sim_board[2][0] == le) or # down the left side
+            (sim_board[0][1] == le and sim_board[1][1] == le and sim_board[2][1] == le) or # down the middle
+            (sim_board[0][2] == le and sim_board[1][2] == le and sim_board[2][2] == le) or # down the right side
+            (sim_board[0][0] == le and sim_board[1][1] == le and sim_board[2][2] == le) or # diagonal
+            (sim_board[0][2] == le and sim_board[1][1] == le and sim_board[2][0] == le)): # diagonal
+                possiblecount += 1
+                pos = Vector2(i, j) # Set new possible win position
+        if possiblecount > 0:
+            return pos
+        else:
+            return pos
+
+                    
+    else:
+        return ((bo[7] == le and bo[8] == le and bo[9] == le) or # across the top
+
+        (bo[4] == le and bo[5] == le and bo[6] == le) or # across the middle
+
+        (bo[1] == le and bo[2] == le and bo[3] == le) or # across the bottom
+        (bo[7] == le and bo[4] == le and bo[1] == le) or # down the left side
+        (bo[8] == le and bo[5] == le and bo[2] == le) or # down the middle
+        (bo[9] == le and bo[6] == le and bo[3] == le) or # down the right side
+        (bo[7] == le and bo[5] == le and bo[3] == le) or # diagonal
+        (bo[9] == le and bo[5] == le and bo[1] == le)) # diagonal
 
 def isWinner(bo, le):
+    if usevectors: # USING 2D ARRAYS
+        return ((bo[2][0] == le and bo[2][1] == le and bo[2][2] == le) or # across the top
 
-    return ((bo[7] == le and bo[8] == le and bo[9] == le) or # across the top
+        (bo[1][0] == le and bo[1][1] == le and bo[1][2] == le) or # across the middle
 
-    (bo[4] == le and bo[5] == le and bo[6] == le) or # across the middle
+        (bo[0][0] == le and bo[0][1] == le and bo[0][2] == le) or # across the bottom
+        (bo[0][0] == le and bo[1][0] == le and bo[2][0] == le) or # down the left side
+        (bo[0][1] == le and bo[1][1] == le and bo[2][1] == le) or # down the middle
+        (bo[0][2] == le and bo[1][2] == le and bo[2][2] == le) or # down the right side
+        (bo[0][0] == le and bo[1][1] == le and bo[2][2] == le) or # diagonal
+        (bo[0][2] == le and bo[1][1] == le and bo[2][0] == le)) # diagonal
+    else:
+        return ((bo[7] == le and bo[8] == le and bo[9] == le) or # across the top
 
-    (bo[1] == le and bo[2] == le and bo[3] == le) or # across the bottom
-    (bo[7] == le and bo[4] == le and bo[1] == le) or # down the left side
-    (bo[8] == le and bo[5] == le and bo[2] == le) or # down the middle
-    (bo[9] == le and bo[6] == le and bo[3] == le) or # down the right side
-    (bo[7] == le and bo[5] == le and bo[3] == le) or # diagonal
-    (bo[9] == le and bo[5] == le and bo[1] == le)) # diagonal
+        (bo[4] == le and bo[5] == le and bo[6] == le) or # across the middle
+
+        (bo[1] == le and bo[2] == le and bo[3] == le) or # across the bottom
+        (bo[7] == le and bo[4] == le and bo[1] == le) or # down the left side
+        (bo[8] == le and bo[5] == le and bo[2] == le) or # down the middle
+        (bo[9] == le and bo[6] == le and bo[3] == le) or # down the right side
+        (bo[7] == le and bo[5] == le and bo[3] == le) or # diagonal
+        (bo[9] == le and bo[5] == le and bo[1] == le)) # diagonal
 def getBoardCopy(board):
+    return theBoard
     dupeBoard = []
     for i in board:
         dupeBoard.append(i)
     return dupeBoard
-def isSpaceFree(board, move):
-    return board[move] == ' '
+def isSpaceFree(board, move, emptychar):
+    # Check (with Vector2 move) if position is empty on 2 Dimensonal array.
+    return board[move.y][move.x] == emptychar
 def getPlayerMove(board):
     move = ' '
 
-    while move not in '1 2 3 4 5 6 7 8 9'.split() or not isSpaceFree(board, int(move)):
+    while move not in '1 2 3 4 5 6 7 8 9'.split() or not isSpaceFree(board, int(move), ' '):
 
         print('What is your next move? (1-9)')
 
@@ -94,7 +182,7 @@ def chooseRandomMoveFromList(board, movesList):
 
     for i in movesList:
 
-        if isSpaceFree(board, i):
+        if isSpaceFree(board, i, ' '):
 
             possibleMoves.append(i)
     if len(possibleMoves) != 0:
@@ -103,8 +191,15 @@ def chooseRandomMoveFromList(board, movesList):
 
     else:
         # Not return None, return random to not die.
-        print('oof avoided')
-        return random.randint(0,8)
+        if (isBoardFull(theBoard)):
+            pass
+        else:
+            # Get random move
+            while True:
+                rand = Vector2(random.randint(0,2), random.randint(0,2))
+                if isSpaceFree(theBoard, rand, emptychar):
+                    print('oof avoided') #Successfully returned random
+                    return rand
 def getComputerMove(board, computerLetter):
     if computerLetter == 'X':
 
@@ -118,20 +213,29 @@ def getComputerMove(board, computerLetter):
         copy = getBoardCopy(board)
 
     
-    move = chooseRandomMoveFromList(board, [1, 3, 7, 9])
+    move = chooseRandomMoveFromList(board, [Vector2(0, 0), Vector2(0, 2), Vector2(2, 0), Vector2(2, 2)])
     print("move: " + str(move))
     if move != None:
 
         return move
     else:
-        move = random.randint(0,8)
-        print('oof avoided')
-        return move
+        if (isBoardFull(theBoard)):
+            print('board full')
+            pass
+        else:
+            # Get random move
+            while True:
+                rand = Vector2(random.randint(0,2), random.randint(0,2))
+                if isSpaceFree(theBoard, rand, emptychar):
+                    print('oof avoided') #Successfully returned random
+                    return rand
+            return move
 
 def isBoardFull(board):
-    for i in range(1, 10):
-        if isSpaceFree(board, i):
-            return False
+    for i in range(len(board)):
+        for j in range(len(board[i])):
+            if isSpaceFree(board, Vector2(i, j), emptychar):
+                return False
     return True
 
 def domove():
@@ -148,7 +252,6 @@ def domove():
 
 print('Welcome to Tic Tac Toe!')
 while True:
-    theBoard = [' '] * 10
     playerLetter, computerLetter = inputPlayerLetter()
     turn = whoGoesFirst()
     print('The ' + turn + ' will go first.')
@@ -187,8 +290,16 @@ while True:
                 # End game
                 gameIsPlaying = False
 
-            else:
+            # Simulate possible winning moves 
+              # NOT FULLY IMPLEMENTED YET!
+            # wins = canWin(theBoard, playerLetter)
+            # if wins.x != Vector2(-1, -1).x and wins.y != Vector2(-1, -1).y:
 
+            #     #drawBoard(theBoard)
+
+            #     print('Win available! (' + str(wins.x) + ', ' + str(wins.y) + ')')
+            else:
+                
                 if isBoardFull(theBoard):
 
                     drawBoard(theBoard)
@@ -199,6 +310,7 @@ while True:
 
                 else:
                     turn = 'computer'
+                    #print('Can\'t win yet' + '(' + str(wins.x) + ', ' + str(wins.y) + ')') # Using Escape Character "\" to allow for apostrophe -> (\')
 
 
 
