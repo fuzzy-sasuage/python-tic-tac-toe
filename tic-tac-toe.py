@@ -1,4 +1,17 @@
 import random
+
+#Vector2 Class
+
+class Vector2:
+    def __init__(self, x, y):
+        self.x = int(x)
+        self.y = int(y)
+    def reset(self):
+        self.x = 0
+        self.y = 0
+    def getpos(self):
+        pass
+
 def drawBoard(board):
     print('   |   |')
     print(' ' + board[1] + ' | ' + board[2] + ' | ' + board[3])
@@ -89,8 +102,9 @@ def chooseRandomMoveFromList(board, movesList):
         return random.choice(possibleMoves)
 
     else:
-
-        return None
+        # Not return None, return random to not die.
+        print('oof avoided')
+        return random.randint(0,8)
 def getComputerMove(board, computerLetter):
     if computerLetter == 'X':
 
@@ -103,19 +117,34 @@ def getComputerMove(board, computerLetter):
 
         copy = getBoardCopy(board)
 
-     
+    
     move = chooseRandomMoveFromList(board, [1, 3, 7, 9])
-
+    print("move: " + str(move))
     if move != None:
 
         return move
-
+    else:
+        move = random.randint(0,8)
+        print('oof avoided')
+        return move
 
 def isBoardFull(board):
     for i in range(1, 10):
         if isSpaceFree(board, i):
             return False
     return True
+
+def domove():
+    # Define player input
+    playerx = input('Input X Coordinate: ') 
+    playery = input('Input Y Coordinate: ')
+    playerthing = input('Input new thing: ')
+
+    pos = Vector2(playerx, playery)
+
+    print('x=' + str(pos.x) + ', y=' + str(pos.y))
+
+    theBoard[pos.y][pos.x] = playerthing
 
 print('Welcome to Tic Tac Toe!')
 while True:
@@ -130,13 +159,23 @@ while True:
     while gameIsPlaying:
 
         if turn == 'player':
+            
+            usevectors = True
 
 
             drawBoard(theBoard)
+            if usevectors:
+                domove()
+                for i in range(len(theBoard)):
+                    row = ''
+                    for j in range(len(theBoard[i])):
+                        row += ' ' + theBoard[i][j] + ' '
+                    print(row + '\n')
+            else:
 
-            move = getPlayerMove(theBoard)
+                move = getPlayerMove(theBoard)
 
-            makeMove(theBoard, playerLetter, move)
+                makeMove(theBoard, playerLetter, move)
 
 
 
@@ -145,7 +184,7 @@ while True:
                 drawBoard(theBoard)
 
                 print('SKO! You have won the game!')
-
+                # End game
                 gameIsPlaying = False
 
             else:
